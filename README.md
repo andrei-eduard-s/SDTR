@@ -5,24 +5,24 @@ Acest proiect constă în dezvoltarea unui sistem adaptiv de ventilație pentru 
 
 ## Cerințe și implementare
 
-✔ **RTOS utilizat**: FreeRTOS prin CMSIS-RTOS2 API  
+**RTOS utilizat**: FreeRTOS prin CMSIS-RTOS2 API  
 ```c
 #include "cmsis_os.h" // Folosim RTOS (FreeRTOS prin CMSIS-RTOS2 API)
 ```
 
-✔ **Cel puțin 2 procese**: proiectul are 3 task-uri independente:
+**Numar de procese**: proiectul are 3 task-uri independente:
 - `StartTask_Sensor` – citire senzor DHT11
 - `StartTask_Control` – procesare date și control ventilator
 - `StartTask_Debug` – transmitere telemetrie prin Bluetooth
 
-✔ **Un proces de timp real cu interacțiune cu mediul exterior**:  
+**Un proces de timp real cu interacțiune cu mediul exterior**:  
 `StartTask_Control` citește datele și modifică PWM-ul ventilatorului:  
 ```c
 __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1,
    (duty * (__HAL_TIM_GET_AUTORELOAD(&htim3)+1))/100);
 ```
 
-✔ **Un proces de comunicație la distanță**:  
+**Un proces de comunicație la distanță**:  
 `StartTask_Debug` transmite periodic date prin UART3 → modul Bluetooth HC-05.  
 ```c
 sprintf(txBuf, "Temp=%d C, Hum=%d %%, Duty=%d %%\r\n",
@@ -30,7 +30,7 @@ sprintf(txBuf, "Temp=%d C, Hum=%d %%, Duty=%d %%\r\n",
 HAL_UART_Transmit(&huart3, (uint8_t*)txBuf, strlen(txBuf), HAL_MAX_DELAY);
 ```
 
-✔ **Procese independente, sincronizate prin cozi de mesaje**:  
+**Procese independente, sincronizate prin cozi de mesaje**:  
 - `qSensorHandle` leagă **Sensor → Control**  
 - `qTlmHandle` leagă **Control → Debug**  
 ```c
@@ -38,7 +38,7 @@ qSensorHandle = osMessageQueueNew(5, sizeof(SensorData_t), NULL);
 qTlmHandle    = osMessageQueueNew(5, sizeof(SensorData_t), NULL);
 ```
 
-✔ **Tratamentul concurenței**: mutex pe UART pentru a preveni accesul simultan.  
+**Tratarea concurenței**: mutex pe UART pentru a preveni accesul simultan.  
 ```c
 uartMutexHandle = osMutexNew(NULL);
 osMutexAcquire(uartMutexHandle, osWaitForever);
@@ -50,12 +50,12 @@ osMutexRelease(uartMutexHandle);
 
 ## Specificații
 
-✔ **Microcontroller**: STM32F103RB (ARM Cortex-M3, placă Nucleo).  
-✔ **Resurse hardware integrate**: Timer3 PWM, GPIO pentru DHT11, UART3 pentru HC-05.  
-✔ **Interfață de intrare**: senzor DHT11 (temperatură și umiditate).  
-✔ **Interfață de ieșire**: ventilator controlat PWM și telemetrie transmisă Bluetooth.  
-✔ **Protocol de comunicație**: UART → Bluetooth (HC-05).  
-✔ **Răspuns în timp real**: control ventilator în funcție de temperatură, raportare prin Bluetooth.
+- **Microcontroller**: STM32F103RB (ARM Cortex-M3, placă Nucleo).  
+- **Resurse hardware integrate**: Timer3 PWM, GPIO pentru DHT11, UART3 pentru HC-05.  
+- **Interfață de intrare**: senzor DHT11 (temperatură și umiditate).  
+- **Interfață de ieșire**: ventilator controlat PWM și telemetrie transmisă Bluetooth.  
+- **Protocol de comunicație**: UART → Bluetooth (HC-05).  
+- **Răspuns în timp real**: control ventilator în funcție de temperatură, raportare prin Bluetooth.
 
 ---
 
