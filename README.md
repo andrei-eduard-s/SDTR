@@ -124,6 +124,8 @@ E2E ≈ 31574 µs (aprox. 31,5 ms)
 ```
 Aceasta confirmă că întregul pipeline senzor → control → comunicație respectă cerințele de timp real, oferind un răspuns sub 50 ms.
 
+În proiect, factorul dominant este senzorul DHT11, care necesită ~20–30 ms pentru conversie (ex. citire completă ≈25 ms). La acesta se adaugă întârzieri minore din planificarea task-urilor FreeRTOS (câteva sute de µs) și din transmisia UART prin HC-05 (~1–2 ms). Resursele partajate protejate prin mutex au impact nesemnificativ. Măsurarea efectuată (E2E ≈ 31,5 ms) confirmă că întreg lanțul senzor → control → ventilator se încadrează în cerințele de timp real.
+
 ## Concluzie
 
 Acest proiect: 
